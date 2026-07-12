@@ -1,0 +1,261 @@
+/* ==========================================================
+   ZAKLADNI RESET + SHELL
+   Tohle je to nejdulezitejsi misto v cele appce z hlediska bugu,
+   ktery jsme resili: #app-shell je position:fixed + inset:0, coz
+   VZDY presne odpovida viditelne plose prohlizece (na rozdil od
+   height:100dvh, ktere se muze chovat nespolehlive pri skryvani/
+   zobrazovani listy s adresou na mobilu). Spodni navigace neni
+   zadne zvlastni "fixed" - je to normalni polozka flex sloupce
+   uvnitr tohohle ukotveneho ramecku, takze nemuze nikam "utect".
+   ========================================================== */
+:root{
+  --muted:#94a0bc;
+  --line:rgba(122,141,190,.22);
+  --accent:#b34cff;
+  --radius:3px;
+  --bg-deep:#02050e;
+  --card-bg:rgba(4,7,18,.6);
+  --card-bg-2:rgba(6,10,22,.5);
+  --text-main:#f5f7ff;
+  --font-head:inherit;
+  --font-mono:inherit;
+  --divider-style:solid;
+  --grid-opacity:.03;
+}
+
+/* ==========================================================
+   MOTIV "SKICA" - druhy prepinatelny motiv, architektonicka
+   skica/blueprint. Prepina se pridanim [data-theme="sketch"]
+   na #app-shell (viz layout.js / settings.js). Vsechno, co
+   pouziva promenne vyse, se prebarvi samo - zadne dalsi zasahy
+   v JS souborech nejsou potreba.
+   ========================================================== */
+[data-theme="sketch"]{
+  --muted:#6d6a5e;
+  --line:#1d1e1c;
+  --accent:#a8503c;
+  --radius:0px;
+  --bg-deep:#dedad0;
+  --card-bg:#f2efe6;
+  --card-bg-2:#f2efe6;
+  --text-main:#1d1e1c;
+  --font-head:Georgia,serif;
+  --font-mono:"Courier New",monospace;
+  --divider-style:dashed;
+  --grid-opacity:.05;
+  --brick:#a8503c;
+  --brick-soft:#c9836f;
+}
+/* POZOR: zadny plosny grayscale filtr - obrazek domu ma zamerne
+   cihlove cervene akcenty a ty chceme zachovat, ne odbarvit */
+[data-theme="sketch"] #app-frame{
+  background:#f2efe6 !important;
+}
+[data-theme="sketch"] #app-frame:before{
+  background-image:linear-gradient(rgba(29,30,28,var(--grid-opacity)) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(29,30,28,var(--grid-opacity)) 1px,transparent 1px) !important;
+}
+[data-theme="sketch"] h1, [data-theme="sketch"] h2{ font-family:var(--font-head); color:var(--text-main) !important; }
+[data-theme="sketch"] .topbar, [data-theme="sketch"] #bottom-nav{ border-color:var(--line) !important; background:var(--card-bg) !important; }
+[data-theme="sketch"] .nav-add{ border-color:var(--brick) !important; background:var(--card-bg) !important; box-shadow:2px 2px 0 rgba(29,30,28,.15) !important; color:var(--brick) !important; }
+[data-theme="sketch"] .nav-item.active{ color:var(--brick) !important }
+[data-theme="sketch"] .btn-primary{ border-radius:0 !important; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.03em;
+  border-color:var(--brick) !important; color:var(--brick) !important; box-shadow:2px 2px 0 rgba(29,30,28,.12) }
+[data-theme="sketch"] body, [data-theme="sketch"] #app-shell{ background:#dedad0 }
+[data-theme="sketch"] .confirm-sheet{ background:var(--card-bg) !important; border-color:var(--line) !important }
+[data-theme="sketch"] .confirm-sheet p{ color:#1d1e1c !important }
+[data-theme="sketch"] .confirm-ok{ color:var(--brick) !important; border-color:var(--brick) !important }
+[data-theme="sketch"] .confirm-cancel{ color:var(--muted) !important }
+
+/* text natvrdo bily/svetly (psano pro tmavy neon) by na papire zmizel -
+   vynutime tmavy inkoust, ale jen na textu, ne na pozadi tlacitek */
+[data-theme="sketch"] body *{ color:#1d1e1c !important }
+[data-theme="sketch"] .dcard{ border-color:var(--brick) !important; color:var(--brick) !important; box-shadow:2px 2px 0 rgba(29,30,28,.08) !important }
+[data-theme="sketch"] .gallery-photo{ border-color:var(--line) !important }
+[data-theme="sketch"] .stage-status-line{ color:var(--brick) !important }
+[data-theme="sketch"] .stage-status-line i{ background:var(--brick) !important; box-shadow:none !important }
+[data-theme="sketch"] .finish-btn{ color:var(--brick) !important; border-color:var(--brick) !important }
+[data-theme="sketch"] body svg{ color:#1d1e1c !important }
+[data-theme="sketch"] .empty-msg, [data-theme="sketch"] small{ color:#6d6a5e !important }
+
+/* dynamicky vytvarene overlaye (Martin AI, vyberova menu, nabidky pridani) -
+   vytvareji se primo do <body>, mimo hlavni appku, takze bez teto tridy
+   by na ne motiv vubec nedosahl */
+[data-theme="sketch"] .ms-overlay{ background:rgba(242,239,230,.92) !important }
+[data-theme="sketch"] .ms-overlay > div{ background:var(--card-bg) !important; border-color:var(--line) !important; box-shadow:2px 2px 0 rgba(29,30,28,.12) !important }
+[data-theme="sketch"] .ms-overlay [style*="border:1px solid #b34cff"],
+[data-theme="sketch"] .ms-overlay [style*="color:#b34cff"]{ border-color:var(--brick) !important; color:var(--brick) !important }
+
+/* OPRAVA: back-btn/icon-btn meli natvrdo tmave pozadi (#060b18cc, pro
+   neon rezim) - v kombinaci s vynucenym tmavym textem/ikonou to znamenalo
+   tmava ikona na tmavem pozadi = neviditelne. Svetle pozadi + cihlovy
+   akcent na ikone, at je jasne videt i kam se kliká. */
+[data-theme="sketch"] .back-btn, [data-theme="sketch"] .icon-btn, [data-theme="sketch"] .square-btn, [data-theme="sketch"] .menu-btn{
+  background:var(--card-bg) !important; border:1.5px solid var(--line) !important; color:var(--brick) !important;
+  box-shadow:1px 1px 0 rgba(29,30,28,.12) !important;
+}
+[data-theme="sketch"] .back-btn svg, [data-theme="sketch"] .icon-btn svg, [data-theme="sketch"] .square-btn svg, [data-theme="sketch"] .menu-btn svg{ color:var(--brick) !important }
+
+/* jemny stin pod kartami - trocha "vahy", at to neni uplne ploche */
+[data-theme="sketch"] .card, [data-theme="sketch"] [style*="border:1px solid var(--line)"]{
+  box-shadow:2px 2px 0 rgba(29,30,28,.08);
+}
+
+[data-theme="sketch"] .f-input, [data-theme="sketch"] .f-textarea{
+  background:#fff !important; border:1.5px solid var(--line) !important;
+}
+[data-theme="sketch"] .f-input::placeholder, [data-theme="sketch"] .f-textarea::placeholder{ color:#a19d8e !important }
+
+[data-theme="sketch"] .tile-del{ background:#fff !important; border-color:var(--line) !important; color:var(--brick) !important }
+[data-theme="sketch"] .tile-item svg{ stroke:#1d1e1c !important; color:#1d1e1c !important }
+
+[data-theme="sketch"] .dd-btn:not(#projBtn), [data-theme="sketch"] .dd-panel{ background:#fff !important; border-color:var(--line) !important; }
+[data-theme="sketch"] .dd-item{ border-color:var(--line) !important }
+[data-theme="sketch"] .dd-item.is-active{ background:rgba(168,80,60,.08) !important }
+[data-theme="sketch"] .dd-btn i{ background:var(--brick) !important }
+[data-theme="sketch"] .dd-item i{ background:var(--brick) !important }
+
+[data-theme="sketch"] #ccBox{ border-color:var(--brick) !important; background:var(--card-bg) !important; box-shadow:2px 2px 0 rgba(29,30,28,.1) !important; color:var(--brick) !important }
+[data-theme="sketch"] #wheelScroll > div{ border-color:var(--line) !important; background:var(--card-bg) !important; box-shadow:none !important; color:#1d1e1c !important }
+[data-theme="sketch"] .stage-card{ border-color:var(--brick) !important; box-shadow:2px 2px 0 rgba(29,30,28,.1) !important }
+[data-theme="sketch"] .stage-card *[style*="border:1px solid"]{ border-color:var(--brick) !important; background:var(--card-bg) !important }
+
+[data-theme="sketch"] .hero-gradient{ display:none !important }
+
+.house-neon{ display:block }
+.house-sketch{ display:none }
+[data-theme="sketch"] .house-neon{ display:none !important }
+[data-theme="sketch"] .house-sketch{ display:block !important; filter:none !important }
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg-deep);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  overscroll-behavior:none;color:#f5f7ff}
+
+#app-shell{
+  position:fixed; inset:0;
+  display:flex; justify-content:center;
+  background:var(--bg-deep);
+  z-index:1;
+}
+#app-frame{
+  position:relative; width:100%; max-width:480px; height:100%;
+  display:flex; flex-direction:column; overflow:hidden;
+  background:radial-gradient(circle at 20% 0%, #10203a 0, #02050e 28%, #01020a 100%);
+}
+#app-frame:before{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+  background:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+             linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:28px 28px; mask-image:linear-gradient(#000,transparent 70%);
+}
+#app-content{
+  position:relative; z-index:2;
+  flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden;
+  display:flex; flex-direction:column;
+}
+
+/* jemny prechod pri kazde zmene obrazovky - misto aby to "surove" naskocilo */
+#app-content.enter{ animation:screenIn .22s ease both; }
+@keyframes screenIn{ from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+
+/* ==========================================================
+   TOPBAR - kazda obrazovka si sem vyplni vlastni obsah, ale
+   zakladni rozmery/odsazeni jsou spolecne
+   ========================================================== */
+.topbar{
+  padding:calc(14px + env(safe-area-inset-top)) 16px 4px;
+  display:flex; align-items:center; gap:10px; flex:0 0 auto; position:relative;
+}
+.back-btn,.icon-btn,.square-btn{
+  width:32px; height:32px; border-radius:var(--radius); border:1px solid var(--line);
+  background:#060b18cc; display:grid; place-items:center; color:#fff; flex:0 0 auto; cursor:pointer;
+}
+.topbar h1{margin:0; font-size:18px; font-weight:800; flex:1}
+.topbar .top-actions{display:flex; gap:8px}
+
+/* ==========================================================
+   OBSAH OBRAZOVKY (scrollovatelny vnitrek pod topbarem)
+   ========================================================== */
+.screen-scroll{flex:1 1 auto; min-height:0; overflow-y:auto; padding:6px 16px calc(24px + env(safe-area-inset-bottom))}
+
+/* ==========================================================
+   SPODNI NAVIGACE - normalni flex polozka, NE position:fixed.
+   Je spravne dole vzdy, protoze cely #app-frame je fixni na
+   viditelnou plochu (viz komentar nahore).
+   ========================================================== */
+#bottom-nav{
+  flex:0 0 auto; position:relative; z-index:2;
+  display:grid; grid-template-columns:1fr 1fr 60px 1fr 1fr; align-items:center;
+  padding:5px 14px calc(6px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line); background:rgba(3,6,15,.92);
+}
+#bottom-nav[hidden]{display:none}
+.nav-item{display:flex; flex-direction:column; align-items:center; gap:3px; color:#a7b0cc;
+  background:none; border:0; font:inherit; cursor:pointer; padding:4px}
+.nav-item svg{width:20px; height:20px}
+.nav-item b{font-size:9.5px; font-weight:700}
+.nav-item.active{color:#c15cff}
+.nav-add{width:44px; height:44px; border-radius:50%; border:2px solid #954aff; background:#160826;
+  display:grid; place-items:center; color:#fff; margin:0 auto; box-shadow:0 0 22px rgba(179,76,255,.55);
+  cursor:pointer; padding:0}
+
+/* ==========================================================
+   RYCHLE PRIDANI (radialni menu) - sdilene, jedna definice pro
+   celou appku (drive samostatna stranka, ted overlay nad
+   cimkoliv, kdekoliv v appce jsi)
+   ========================================================== */
+#quick-add-backdrop{position:absolute; inset:0; background:radial-gradient(circle at 50% 100%, rgba(2,4,10,.97) 0%, rgba(2,4,10,.94) 35%, rgba(2,4,10,.75) 65%, rgba(2,4,10,.55) 100%); z-index:40;
+  opacity:0; pointer-events:none; transition:opacity .18s ease}
+#quick-add-backdrop.open{opacity:1; pointer-events:auto}
+#quick-add-backdrop[hidden]{display:none}
+#quick-add-radial{position:absolute; left:50%; bottom:calc(28px + env(safe-area-inset-bottom)); z-index:41; pointer-events:none}
+#quick-add-radial[hidden]{display:none}
+.qa-sat{position:absolute; left:0; top:0; display:flex; flex-direction:column; align-items:center; gap:6px;
+  transform:translate(-50%,-50%) scale(.3); opacity:0; transition:transform .22s cubic-bezier(.34,1.4,.64,1), opacity .18s ease;
+  pointer-events:none}
+#quick-add-radial.open .qa-sat{opacity:1; pointer-events:auto}
+.qa-btn{width:52px; height:52px; border-radius:50%; border:2px solid var(--sc); background:#0c1020;
+  display:grid; place-items:center; color:var(--sc); box-shadow:0 0 18px color-mix(in srgb, var(--sc) 45%, transparent)}
+.qa-btn svg{width:22px; height:22px}
+.qa-sat b{font-size:11px; font-weight:800; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.9), 0 0 8px rgba(0,0,0,.6)}
+
+/* ==========================================================
+   SDILENE OBECNE PRVKY (pouzivaji je vsechny obrazovky)
+   ========================================================== */
+.section-label{font-size:11.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:800; margin:16px 0 8px}
+.field-block{margin-bottom:12px}
+.f-label{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:800; margin:0 0 6px; display:block}
+.f-input,.f-textarea{width:100%; border:1px solid var(--line); background:rgba(6,10,22,.5); color:#fff;
+  padding:10px 12px; font-size:13.5px; font:inherit; border-radius:var(--radius)}
+.f-input::placeholder,.f-textarea::placeholder{color:#5c6584}
+.f-input:focus,.f-textarea:focus{outline:none; border-color:var(--accent)}
+.f-textarea{resize:none; min-height:80px; line-height:1.4}
+.btn-primary{width:100%; border-radius:var(--radius); padding:12px; font-weight:800; font-size:14px;
+  border:1px solid var(--accent); background:rgba(255,255,255,.02); color:#fff; cursor:pointer;
+  filter:drop-shadow(0 0 6px var(--accent))}
+.btn-ghost{width:100%; border-radius:var(--radius); padding:11px; font-weight:700; font-size:12.5px;
+  border:1px solid var(--line); background:transparent; color:var(--muted); cursor:pointer}
+.empty-msg{color:var(--muted); font-size:12px; text-align:center; padding:30px 0}
+
+.dropdown{position:relative}
+.dd-btn{width:100%; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--line);
+  background:rgba(6,10,22,.5); padding:10px 12px; color:#fff; font-size:12.5px; font-weight:700; border-radius:var(--radius); cursor:pointer}
+.dd-btn .left{display:flex; align-items:center; gap:7px}
+.dd-btn i{width:8px; height:8px; background:var(--ddc,#fff); display:inline-block}
+.dd-panel{position:relative; border:1px solid var(--line); background:#0b0f1c; max-height:0; overflow:hidden;
+  transition:max-height .18s ease; margin-top:0}
+.dd-panel.open{max-height:260px; overflow-y:auto; margin-top:4px}
+.dd-item{display:flex; align-items:center; gap:8px; padding:9px 12px; font-size:12px; color:#dfe4f5;
+  border-top:1px solid var(--line); cursor:pointer}
+.dd-item:first-child{border-top:0}
+.dd-item.is-active{background:rgba(255,255,255,.04); font-weight:800; color:#fff}
+
+/* modalni potvrzovaci dialog - nahrazuje prohlizecovy confirm(), stejne chovani vsude */
+#confirm-overlay{position:fixed; inset:0; background:rgba(2,4,10,.7); z-index:90; display:none; align-items:flex-end; justify-content:center}
+#confirm-overlay.open{display:flex}
+.confirm-sheet{width:100%; max-width:480px; background:#0b0f1c; border-top:1px solid var(--line); padding:20px 18px calc(20px + env(safe-area-inset-bottom))}
+.confirm-sheet p{margin:0 0 16px; font-size:13.5px; line-height:1.5; color:#dfe4f5}
+.confirm-actions{display:flex; gap:8px}
+.confirm-actions button{flex:1; padding:11px; border-radius:var(--radius); font-weight:800; font-size:13px; cursor:pointer}
+.confirm-actions .confirm-cancel{border:1px solid var(--line); background:transparent; color:var(--muted)}
+.confirm-actions .confirm-ok{border:1px solid var(--accent); background:rgba(255,255,255,.03); color:#fff}
